@@ -91,6 +91,8 @@ exports.getAllProperties = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = Math.max(1, parseInt(req.query.limit) || 20);
     const search = req.query.search?.trim();
+    const category = req.query.category?.trim();
+
     const query = {};
 
     if (search) {
@@ -99,6 +101,11 @@ exports.getAllProperties = async (req, res) => {
         { location: { $regex: search, $options: 'i' } },
         { description: { $regex: search, $options: 'i' } },
       ];
+    }
+
+    // Only filter by category if provided and not 'All'
+    if (category && category !== 'All') {
+      query.category = category;
     }
 
     const skip = (page - 1) * limit;
@@ -131,7 +138,7 @@ exports.getPropertyById = async (req, res) => {
     }
     property.views += 1;
     await property.save();
-    res.json(property);
+    res.json({ property });
   } catch (err) {
     console.error('🔥 Get Property Error:', err);
     res

@@ -19,7 +19,7 @@ router.post(
   uploadProperty
 );
 router.get('/', getAllProperties);
-router.get('/:id', authMiddleware, adminAuth, getPropertyById);
+router.get('/:id', getPropertyById);
 router.put(
   '/:id',
   authMiddleware,
