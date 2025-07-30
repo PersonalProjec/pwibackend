@@ -3,10 +3,6 @@ const cloudinary = require('cloudinary').v2;
 
 exports.uploadProperty = async (req, res) => {
   try {
-    console.log('🔥 req.user:', req.user);
-    console.log('🔥 req.body:', req.body);
-    console.log('🔥 req.files:', req.files);
-
     const {
       title,
       description,
@@ -16,6 +12,7 @@ exports.uploadProperty = async (req, res) => {
       category,
       type,
       status,
+      currency = 'NGN',
     } = req.body;
 
     if (!title || !price || !location || !description || !category || !type) {
@@ -37,8 +34,6 @@ exports.uploadProperty = async (req, res) => {
         .status(400)
         .json({ message: 'At least one image is required' });
     }
-
-    // Upload images to Cloudinary
     const uploadedImages = [];
     for (const file of req.files) {
       const result = await cloudinary.uploader.upload(file.path, {
@@ -59,6 +54,10 @@ exports.uploadProperty = async (req, res) => {
       category,
       type,
       status: safeStatus,
+      currency,
+      area: req.body.area || '',
+      featured: req.body.featured === 'true',
+      approved: req.body.approved === 'true',
       tags:
         typeof tags === 'string'
           ? tags
@@ -149,17 +148,14 @@ exports.getPropertyById = async (req, res) => {
 
 exports.editProperty = async (req, res) => {
   try {
-    // Get URLs for existing images
     const existingImages = req.body.existingImages
       ? JSON.parse(req.body.existingImages)
       : [];
-    // New images (Cloudinary URLs) may be in req.files.images or req.files.newImages
     let newImageUrls = [];
     if (req.files && req.files.images) {
       newImageUrls = req.files.images.map((file) => file.path);
     }
     if (req.files && req.files.newImages) {
-      // For upload.fields, new images may be in req.files.newImages
       newImageUrls = newImageUrls.concat(
         req.files.newImages.map((file) => file.path)
       );
@@ -179,6 +175,7 @@ exports.editProperty = async (req, res) => {
       'tags',
       'type',
       'category',
+      'currency',
       'featured',
       'approved',
       'status',

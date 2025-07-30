@@ -20,6 +20,11 @@ const PropertySchema = new mongoose.Schema(
     },
     views: { type: Number, default: 0 },
     viewedAt: [{ type: Date }],
+    currency: {
+      type: String,
+      default: 'NGN', // Default to Nigerian Naira
+      enum: ['NGN', 'USD', 'EUR', 'GBP', 'CAD'], // Expand as needed!
+    },
   },
   { timestamps: true }
 );
